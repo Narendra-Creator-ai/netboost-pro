@@ -31,9 +31,14 @@ export default async function handler(
       normalizedUrl = 'https://' + normalizedUrl
     }
 
-    // Try to get URL report
-    const urlId = Buffer.from(normalizedUrl).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+    // VirusTotal uses SHA-256 hash of URL as identifier
+    const encoder = new TextEncoder()
+    const data = encoder.encode(normalizedUrl)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const urlId = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 
+    // Try to get URL report
     const response = await fetch(`https://www.virustotal.com/api/v3/urls/${urlId}`, {
       method: 'GET',
       headers: {
@@ -76,13 +81,16 @@ export default async function handler(
           url: normalizedUrl,
           stats: { malicious: 0, suspicious: 0, undetected: 0, harmless: 0 },
           status: 'pending',
-          message: 'URL submitted for scanning',
+          message: 'URL submitted for scanning. Scan in progress...',
         })
       }
-      return res.status(400).json({ error: 'Failed to submit URL' })
+      
+      const errorText = await submitResponse.text()
+      return res.status(400).json({ error: `Failed to submit URL: ${errorText}` })
     }
 
-    return res.status(400).json({ error: 'Failed to fetch results' })
+    const errorText = await response.text()
+    return res.status(400).json({ error: `API returned ${response.status}: ${errorText}` })
   } catch (error) {
     console.error('Error:', error)
     return res.status(500).json({ 
