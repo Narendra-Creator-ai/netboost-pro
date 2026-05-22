@@ -1,378 +1,389 @@
 import { useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
-import { Menu, Bell, Settings, LogOut, Search, Home, Shield, Activity, Lock, Server, AlertTriangle, CheckCircle, Clock, Trash2, Plus, Sun, Moon, Wifi, Download, Upload } from 'lucide-react'
+import { Shield, Search, Plus, X, BarChart3 } from 'lucide-react'
 
-const queryData = [
-  { time: '00:00', blocked: 24, allowed: 120 },
-  { time: '04:00', blocked: 18, allowed: 95 },
-  { time: '08:00', blocked: 42, allowed: 240 },
-  { time: '12:00', blocked: 65, allowed: 380 },
-  { time: '16:00', blocked: 89, allowed: 450 },
-  { time: '20:00', blocked: 103, allowed: 520 },
-]
-
-const threatData = [
-  { name: 'Malware', value: 234 },
-  { name: 'Phishing', value: 187 },
-  { name: 'Ads', value: 456 },
-  { name: 'Trackers', value: 312 },
-]
-
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#3b82f6']
-
-const recentQueries = [
-  { id: 1, domain: 'malicious-site.com', type: 'Malware', status: 'Blocked', time: '2 mins ago' },
-  { id: 2, domain: 'facebook.com', type: 'Tracker', status: 'Blocked', time: '5 mins ago' },
-  { id: 3, domain: 'github.com', type: 'Safe', status: 'Allowed', time: '8 mins ago' },
-  { id: 4, domain: 'phishing-bank.xyz', type: 'Phishing', status: 'Blocked', time: '12 mins ago' },
-  { id: 5, domain: 'google.com', type: 'Safe', status: 'Allowed', time: '15 mins ago' },
-]
-
-const devices = [
-  { id: 1, name: 'Laptop (Windows)', ip: '192.168.1.100', status: 'Protected', lastSeen: '2 mins ago' },
-  { id: 2, name: 'Phone (iOS)', ip: '192.168.1.101', status: 'Protected', lastSeen: '1 hour ago' },
-  { id: 3, name: 'Tablet (Android)', ip: '192.168.1.102', status: 'Protected', lastSeen: '3 hours ago' },
-]
-
-const dnsServers = [
-  { id: 1, name: 'Netboost Primary', ip: '1.1.1.1', type: 'Primary', status: 'Active' },
-  { id: 2, name: 'Netboost Secondary', ip: '1.0.0.1', type: 'Secondary', status: 'Active' },
-  { id: 3, name: 'Custom Server', ip: '8.8.8.8', type: 'Custom', status: 'Inactive' },
-]
-
-function Dashboard({ theme }) {
-  const stats = [
-    { label: 'Queries Today', value: '12,450', icon: Activity, color: 'bg-blue-500' },
-    { label: 'Threats Blocked', value: '1,234', icon: Shield, color: 'bg-red-500' },
-    { label: 'Devices Protected', value: '3', icon: Wifi, color: 'bg-green-500' },
-    { label: 'Uptime', value: '99.9%', icon: CheckCircle, color: 'bg-purple-500' },
-  ]
-
-  return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, idx) => {
-          const Icon = stat.icon
-          return (
-            <div key={idx} className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon size={24} className="text-white" />
-                </div>
-              </div>
-              <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>{stat.label}</p>
-              <p className="text-2xl font-bold mt-2">{stat.value}</p>
-            </div>
-          )
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-          <h2 className="text-lg font-semibold mb-4">DNS Queries (24h)</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={queryData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#334155' : '#e2e8f0'} />
-              <XAxis stroke={theme === 'dark' ? '#94a3b8' : '#64748b'} />
-              <YAxis stroke={theme === 'dark' ? '#94a3b8' : '#64748b'} />
-              <Tooltip contentStyle={{ backgroundColor: theme === 'dark' ? '#1e293b' : '#f8fafc', border: `1px solid ${theme === 'dark' ? '#334155' : '#e2e8f0'}`, borderRadius: '8px' }} />
-              <Line type="monotone" dataKey="blocked" stroke="#ef4444" strokeWidth={2} name="Blocked" />
-              <Line type="monotone" dataKey="allowed" stroke="#10b981" strokeWidth={2} name="Allowed" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-          <h2 className="text-lg font-semibold mb-4">Threats Detected</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={threatData} cx="50%" cy="50%" labelLine={false} label={({ name, value }) => `${name}: ${value}`} outerRadius={80} fill="#8884d8" dataKey="value">
-                {threatData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-        <h2 className="text-lg font-semibold mb-4">Recent DNS Queries</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className={`border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Domain</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Type</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentQueries.map((query) => (
-                <tr key={query.id} className={`border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-                  <td className="px-4 py-3"><code className="text-xs">{query.domain}</code></td>
-                  <td className="px-4 py-3"><span className="text-sm">{query.type}</span></td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${query.status === 'Blocked' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
-                      {query.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-400">{query.time}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </>
-  )
-}
-
-function Protection({ theme }) {
-  return (
-    <>
-      <h2 className="text-2xl font-bold mb-8">Protection Settings</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2"><Shield size={20} /> Malware Protection</h3>
-            <input type="checkbox" defaultChecked className="w-5 h-5" />
-          </div>
-          <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>Block malicious websites and downloads</p>
-        </div>
-
-        <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2"><AlertTriangle size={20} /> Phishing Protection</h3>
-            <input type="checkbox" defaultChecked className="w-5 h-5" />
-          </div>
-          <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>Prevent phishing and credential theft</p>
-        </div>
-
-        <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2"><Lock size={20} /> Ad & Tracker Blocking</h3>
-            <input type="checkbox" defaultChecked className="w-5 h-5" />
-          </div>
-          <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>Block ads, analytics, and trackers</p>
-        </div>
-
-        <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2"><Server size={20} /> Safe Browsing</h3>
-            <input type="checkbox" defaultChecked className="w-5 h-5" />
-          </div>
-          <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>Real-time threat detection</p>
-        </div>
-      </div>
-    </>
-  )
-}
-
-function Devices({ theme }) {
-  return (
-    <>
-      <h2 className="text-2xl font-bold mb-8">Protected Devices</h2>
-      <div className="space-y-4">
-        {devices.map((device) => (
-          <div key={device.id} className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">{device.name}</h3>
-                <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>IP: {device.ip}</p>
-                <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-500'}`}>Last seen: {device.lastSeen}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-full text-sm font-semibold bg-green-500 text-white">{device.status}</span>
-                <button className={`p-2 hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'} rounded-lg`}>
-                  <Trash2 size={18} className="text-red-500" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <button className="w-full mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
-        <Plus size={20} /> Add Device
-      </button>
-    </>
-  )
-}
-
-function QueryLogs({ theme }) {
-  return (
-    <>
-      <h2 className="text-2xl font-bold mb-8">DNS Query Logs</h2>
-      <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} mb-6`}>
-        <div className="flex gap-4">
-          <select className={`px-4 py-2 rounded-lg border ${theme === 'dark' ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-300'}`}>
-            <option>All Queries</option>
-            <option>Blocked Only</option>
-            <option>Allowed Only</option>
-          </select>
-          <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2">
-            <Download size={18} /> Export Log
-          </button>
-        </div>
-      </div>
-      
-      <div className="overflow-x-auto">
-        <table className={`w-full`}>
-          <thead>
-            <tr className={`border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Domain</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Device</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Category</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Action</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentQueries.map((query) => (
-              <tr key={query.id} className={`border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-                <td className="px-4 py-3"><code className="text-xs">{query.domain}</code></td>
-                <td className="px-4 py-3 text-sm">Laptop (Windows)</td>
-                <td className="px-4 py-3 text-sm">{query.type}</td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded text-xs font-semibold ${query.status === 'Blocked' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
-                    {query.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-sm text-slate-400">{query.time}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  )
-}
-
-function DNSServers({ theme }) {
-  return (
-    <>
-      <h2 className="text-2xl font-bold mb-8">DNS Servers</h2>
-      <div className="space-y-4 mb-6">
-        {dnsServers.map((server) => (
-          <div key={server.id} className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">{server.name}</h3>
-                <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>{server.ip}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${server.status === 'Active' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}`}>{server.status}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2">
-        <Plus size={20} /> Add Custom DNS
-      </button>
-    </>
-  )
+interface ScanResult {
+  url: string
+  scanDate: string
+  lastAnalysisStats: {
+    malicious: number
+    suspicious: number
+    undetected: number
+    harmless: number
+  }
+  safetyScore: number
+  status: 'completed' | 'scanning' | 'pending'
 }
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [theme, setTheme] = useState('dark')
-  const [currentPage, setCurrentPage] = useState('dashboard')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('virusTotal_apiKey') || '')
+  const [showApiModal, setShowApiModal] = useState(!apiKey)
+  const [currentPage, setCurrentPage] = useState('scanner')
+  const [urlInput, setUrlInput] = useState('')
+  const [scanning, setScanning] = useState(false)
+  const [scanResults, setScanResults] = useState<ScanResult[]>([])
+  const [comparisonUrls, setComparisonUrls] = useState<string[]>([])
+  const [comparisonResults, setComparisonResults] = useState<ScanResult[]>([])
+
+  const saveApiKey = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem('virusTotal_apiKey', apiKey)
+      setShowApiModal(false)
+    }
+  }
+
+  const handleScan = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!urlInput.trim() || !apiKey) {
+      alert('Please enter a URL and API key')
+      return
+    }
+
+    setScanning(true)
+    try {
+      // Normalize URL
+      let normalizedUrl = urlInput.trim()
+      if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+        normalizedUrl = 'https://' + normalizedUrl
+      }
+
+      // Get URL ID for VirusTotal
+      const urlBuffer = new TextEncoder().encode(normalizedUrl)
+      const hashBuffer = await crypto.subtle.digest('SHA-256', urlBuffer)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+
+      // Try to get existing report first
+      const response = await fetch(`https://www.virustotal.com/api/v3/urls/${btoa(normalizedUrl).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}`, {
+        method: 'GET',
+        headers: {
+          'x-apikey': apiKey,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const stats = data.data.attributes.last_analysis_stats || {
+          malicious: 0,
+          suspicious: 0,
+          undetected: 0,
+          harmless: 0,
+        }
+        const result: ScanResult = {
+          url: normalizedUrl,
+          scanDate: new Date().toLocaleString(),
+          lastAnalysisStats: stats,
+          safetyScore: calculateSafetyScore(stats),
+          status: 'completed',
+        }
+        setScanResults([result, ...scanResults])
+      } else {
+        // Submit for scanning
+        const formData = new FormData()
+        formData.append('url', normalizedUrl)
+
+        const submitResponse = await fetch('https://www.virustotal.com/api/v3/urls', {
+          method: 'POST',
+          headers: {
+            'x-apikey': apiKey,
+          },
+          body: formData,
+        })
+
+        if (submitResponse.ok) {
+          alert('URL submitted for analysis. It may take a moment to complete.')
+          // Add a placeholder result
+          const result: ScanResult = {
+            url: normalizedUrl,
+            scanDate: new Date().toLocaleString(),
+            lastAnalysisStats: { malicious: 0, suspicious: 0, undetected: 0, harmless: 0 },
+            safetyScore: 50,
+            status: 'pending',
+          }
+          setScanResults([result, ...scanResults])
+        } else {
+          throw new Error('Failed to submit URL for scanning')
+        }
+      }
+      setUrlInput('')
+    } catch (error) {
+      alert('Error: ' + (error instanceof Error ? error.message : 'Failed to scan URL'))
+    } finally {
+      setScanning(false)
+    }
+  }
+
+  const calculateSafetyScore = (stats: any): number => {
+    if (!stats) return 100
+    const total = stats.malicious + stats.suspicious + stats.undetected + stats.harmless
+    if (total === 0) return 100
+    const threats = stats.malicious * 2 + stats.suspicious
+    return Math.max(0, 100 - (threats / total) * 100)
+  }
+
+  const addToComparison = (url: string) => {
+    if (!comparisonUrls.includes(url)) {
+      setComparisonUrls([...comparisonUrls, url])
+      const result = scanResults.find(r => r.url === url)
+      if (result) {
+        setComparisonResults([...comparisonResults, result])
+      }
+    }
+  }
+
+  const removeFromComparison = (url: string) => {
+    setComparisonUrls(comparisonUrls.filter(u => u !== url))
+    setComparisonResults(comparisonResults.filter(r => r.url !== url))
+  }
+
+  const ThreatLevel = ({ score }: { score: number }) => {
+    if (score >= 80) return <span className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">SAFE</span>
+    if (score >= 50) return <span className="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded-full">SUSPICIOUS</span>
+    return <span className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full">DANGEROUS</span>
+  }
 
   return (
     <div className={`${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'} min-h-screen`}>
+      {/* API Key Modal */}
+      {showApiModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-8 max-w-md w-full mx-4`}>
+            <h2 className="text-2xl font-bold mb-4">VirusTotal API Key Required</h2>
+            <p className={`mb-4 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+              Get your free API key from <a href="https://www.virustotal.com/gui/home/upload" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">virustotal.com</a>
+            </p>
+            <input
+              type="password"
+              placeholder="Paste your API key here"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className={`w-full px-4 py-2 rounded-lg border mb-4 ${theme === 'dark' ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-300'}`}
+            />
+            <button
+              onClick={saveApiKey}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
+            >
+              Save & Continue
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b sticky top-0 z-40`}>
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className={`p-2 hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'} rounded-lg`}>
-              <Menu size={20} />
-            </button>
-            <div className="flex items-center gap-2">
-              <Shield size={28} className="text-blue-500" />
-              <h1 className="text-2xl font-bold">Netboost Pro</h1>
-            </div>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield size={32} className="text-blue-500" />
+            <h1 className="text-2xl font-bold">Netboost DNS Scanner</h1>
           </div>
           <div className="flex items-center gap-4">
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}>
-              <Search size={18} />
-              <input
-                type="text"
-                placeholder="Search domains..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`bg-transparent outline-none w-32 ${theme === 'dark' ? 'placeholder-slate-400' : 'placeholder-slate-500'}`}
-              />
-            </div>
-            <button className={`p-2 hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'} rounded-lg`}>
-              <Bell size={20} />
+            <button
+              onClick={() => setCurrentPage('scanner')}
+              className={`px-4 py-2 rounded-lg font-semibold ${currentPage === 'scanner' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}`}
+            >
+              Scanner
             </button>
-            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className={`p-2 hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'} rounded-lg`}>
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            <button
+              onClick={() => setCurrentPage('compare')}
+              className={`px-4 py-2 rounded-lg font-semibold ${currentPage === 'compare' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}`}
+            >
+              Compare
+            </button>
+            <button
+              onClick={() => setShowApiModal(true)}
+              className={`px-4 py-2 rounded-lg font-semibold hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}
+            >
+              API Key
             </button>
           </div>
         </div>
       </header>
 
-      <div className="flex">
-        {/* Sidebar */}
-        {sidebarOpen && (
-          <aside className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-50'} w-64 border-r ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} p-6`}>
-            <nav className="space-y-2">
-              <div className="text-xs font-semibold text-slate-400 uppercase mb-4">Navigation</div>
-              <button
-                onClick={() => setCurrentPage('dashboard')}
-                className={`w-full text-left flex items-center gap-3 px-4 py-2 rounded-lg ${currentPage === 'dashboard' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'}`}`}
-              >
-                <Home size={18} /> Dashboard
-              </button>
-              <button
-                onClick={() => setCurrentPage('protection')}
-                className={`w-full text-left flex items-center gap-3 px-4 py-2 rounded-lg ${currentPage === 'protection' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'}`}`}
-              >
-                <Shield size={18} /> Protection
-              </button>
-              <button
-                onClick={() => setCurrentPage('devices')}
-                className={`w-full text-left flex items-center gap-3 px-4 py-2 rounded-lg ${currentPage === 'devices' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'}`}`}
-              >
-                <Wifi size={18} /> Devices
-              </button>
-              <button
-                onClick={() => setCurrentPage('queries')}
-                className={`w-full text-left flex items-center gap-3 px-4 py-2 rounded-lg ${currentPage === 'queries' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'}`}`}
-              >
-                <Activity size={18} /> Query Logs
-              </button>
-              <button
-                onClick={() => setCurrentPage('dns')}
-                className={`w-full text-left flex items-center gap-3 px-4 py-2 rounded-lg ${currentPage === 'dns' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'}`}`}
-              >
-                <Server size={18} /> DNS Servers
-              </button>
-            </nav>
-          </aside>
+      <main className="max-w-6xl mx-auto px-6 py-8">
+        {/* Scanner Page */}
+        {currentPage === 'scanner' && (
+          <>
+            {/* Scan Form */}
+            <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-8 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} mb-8`}>
+              <h2 className="text-2xl font-bold mb-6">Scan Website Security</h2>
+              <form onSubmit={handleScan} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter website URL (e.g., https://example.com)"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  className={`flex-1 px-4 py-3 rounded-lg border ${theme === 'dark' ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-300'}`}
+                />
+                <button
+                  type="submit"
+                  disabled={scanning}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-2"
+                >
+                  <Search size={20} />
+                  {scanning ? 'Scanning...' : 'Scan'}
+                </button>
+              </form>
+            </div>
+
+            {/* Scan Results */}
+            {scanResults.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold mb-4">Recent Scans</h3>
+                {scanResults.map((result, idx) => (
+                  <div key={idx} className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg break-all">{result.url}</h4>
+                        <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                          {result.scanDate} • {result.status === 'pending' ? 'Pending Analysis' : 'Completed'}
+                        </p>
+                      </div>
+                      <ThreatLevel score={result.safetyScore} />
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-4 mb-6">
+                      <div className={`p-4 rounded-lg text-center ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-50'}`}>
+                        <div className="text-2xl font-bold text-red-500">{result.lastAnalysisStats.malicious}</div>
+                        <p className="text-xs text-slate-400">Malicious</p>
+                      </div>
+                      <div className={`p-4 rounded-lg text-center ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-50'}`}>
+                        <div className="text-2xl font-bold text-yellow-500">{result.lastAnalysisStats.suspicious}</div>
+                        <p className="text-xs text-slate-400">Suspicious</p>
+                      </div>
+                      <div className={`p-4 rounded-lg text-center ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-50'}`}>
+                        <div className="text-2xl font-bold text-gray-500">{result.lastAnalysisStats.undetected}</div>
+                        <p className="text-xs text-slate-400">Undetected</p>
+                      </div>
+                      <div className={`p-4 rounded-lg text-center ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-50'}`}>
+                        <div className="text-2xl font-bold text-green-500">{result.lastAnalysisStats.harmless}</div>
+                        <p className="text-xs text-slate-400">Harmless</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => addToComparison(result.url)}
+                        className="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                      >
+                        <Plus size={18} /> Add to Compare
+                      </button>
+                      <button
+                        onClick={() => setScanResults(scanResults.filter((_, i) => i !== idx))}
+                        className={`flex-1 border font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 ${theme === 'dark' ? 'border-slate-600 hover:bg-slate-700' : 'border-slate-300 hover:bg-slate-50'}`}
+                      >
+                        <X size={18} /> Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
-        {/* Main Content */}
-        <main className="flex-1 p-6">
-          {currentPage === 'dashboard' && <Dashboard theme={theme} />}
-          {currentPage === 'protection' && <Protection theme={theme} />}
-          {currentPage === 'devices' && <Devices theme={theme} />}
-          {currentPage === 'queries' && <QueryLogs theme={theme} />}
-          {currentPage === 'dns' && <DNSServers theme={theme} />}
-        </main>
-      </div>
+        {/* Compare Page */}
+        {currentPage === 'compare' && (
+          <>
+            {comparisonUrls.length === 0 ? (
+              <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-12 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} text-center`}>
+                <BarChart3 size={48} className="mx-auto mb-4 text-slate-400" />
+                <p className="text-slate-400 mb-4">No websites added to comparison</p>
+                <button
+                  onClick={() => setCurrentPage('scanner')}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg"
+                >
+                  Go to Scanner
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold mb-6">Website Comparison</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className={`border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
+                        <th className="px-4 py-3 text-left font-semibold">Website</th>
+                        <th className="px-4 py-3 text-center font-semibold">Safety Score</th>
+                        <th className="px-4 py-3 text-center font-semibold">Malicious</th>
+                        <th className="px-4 py-3 text-center font-semibold">Suspicious</th>
+                        <th className="px-4 py-3 text-center font-semibold">Harmless</th>
+                        <th className="px-4 py-3 text-center font-semibold">Status</th>
+                        <th className="px-4 py-3 text-center font-semibold">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonResults.map((result) => (
+                        <tr key={result.url} className={`border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
+                          <td className="px-4 py-3">
+                            <code className="text-sm break-all">{result.url}</code>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className="font-bold text-lg">{result.safetyScore.toFixed(1)}%</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`font-semibold ${result.lastAnalysisStats.malicious > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                              {result.lastAnalysisStats.malicious}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`font-semibold ${result.lastAnalysisStats.suspicious > 0 ? 'text-yellow-500' : 'text-green-500'}`}>
+                              {result.lastAnalysisStats.suspicious}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className="font-semibold text-green-500">{result.lastAnalysisStats.harmless}</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <ThreatLevel score={result.safetyScore} />
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              onClick={() => removeFromComparison(result.url)}
+                              className="text-red-500 hover:text-red-700 font-semibold"
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Comparison Summary */}
+                <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-6 border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} mt-8`}>
+                  <h3 className="text-lg font-bold mb-4">Summary</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className={`p-4 rounded-lg text-center ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-50'}`}>
+                      <p className="text-slate-400 text-sm mb-2">Total Scanned</p>
+                      <p className="text-2xl font-bold">{comparisonResults.length}</p>
+                    </div>
+                    <div className={`p-4 rounded-lg text-center ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-50'}`}>
+                      <p className="text-slate-400 text-sm mb-2">Average Safety Score</p>
+                      <p className="text-2xl font-bold text-green-500">
+                        {(comparisonResults.reduce((acc, r) => acc + r.safetyScore, 0) / comparisonResults.length).toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className={`p-4 rounded-lg text-center ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-50'}`}>
+                      <p className="text-slate-400 text-sm mb-2">Total Threats</p>
+                      <p className="text-2xl font-bold text-red-500">
+                        {comparisonResults.reduce((acc, r) => acc + r.lastAnalysisStats.malicious + r.lastAnalysisStats.suspicious, 0)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </main>
 
       {/* Footer */}
-      <footer className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-t mt-8 py-6 px-6 text-center text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-        <p>© 2026 Netboost Pro DNS Protection. All rights reserved. | Contact: cyberadviser.naren@gmail.com</p>
+      <footer className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-t mt-16 py-6 px-6 text-center text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p>© 2026 Netboost DNS Protection. Powered by VirusTotal. Contact: cyberadviser.naren@gmail.com</p>
       </footer>
     </div>
   )
 }
 
-export default App 
+export default App
