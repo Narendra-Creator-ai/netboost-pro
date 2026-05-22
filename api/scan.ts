@@ -18,10 +18,11 @@ export default async function handler(
     return
   }
 
-  const { url, apiKey } = req.body
+  const { url } = req.body
+  const apiKey = process.env.VIRUSTOTAL_API_KEY
 
   if (!url || !apiKey) {
-    return res.status(400).json({ error: 'Missing url or apiKey' })
+    return res.status(400).json({ error: 'Missing url or VIRUSTOTAL_API_KEY environment variable' })
   }
 
   try {

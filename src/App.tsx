@@ -16,8 +16,6 @@ interface ScanResult {
 
 function App() {
   const [theme, setTheme] = useState('dark')
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('virusTotal_apiKey') || '')
-  const [showApiModal, setShowApiModal] = useState(!apiKey)
   const [currentPage, setCurrentPage] = useState('scanner')
   const [urlInput, setUrlInput] = useState('')
   const [scanning, setScanning] = useState(false)
@@ -26,16 +24,13 @@ function App() {
   const [comparisonResults, setComparisonResults] = useState<ScanResult[]>([])
 
   const saveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('virusTotal_apiKey', apiKey)
-      setShowApiModal(false)
-    }
+    // No longer needed - API key is server-side
   }
 
   const handleScan = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!urlInput.trim() || !apiKey) {
-      alert('Please enter a URL and API key')
+    if (!urlInput.trim()) {
+      alert('Please enter a URL')
       return
     }
 
@@ -46,7 +41,7 @@ function App() {
         normalizedUrl = 'https://' + normalizedUrl
       }
 
-      // Call backend API instead of VirusTotal directly
+      // Call backend API - API key is already on server
       const response = await fetch('/api/scan', {
         method: 'POST',
         headers: {
@@ -54,7 +49,6 @@ function App() {
         },
         body: JSON.stringify({
           url: normalizedUrl,
-          apiKey: apiKey,
         }),
       })
 
@@ -114,31 +108,6 @@ function App() {
 
   return (
     <div className={`${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'} min-h-screen`}>
-      {/* API Key Modal */}
-      {showApiModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} rounded-lg p-8 max-w-md w-full mx-4`}>
-            <h2 className="text-2xl font-bold mb-4">VirusTotal API Key Required</h2>
-            <p className={`mb-4 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-              Get your free API key from <a href="https://www.virustotal.com/gui/home/upload" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">virustotal.com</a>
-            </p>
-            <input
-              type="password"
-              placeholder="Paste your API key here"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className={`w-full px-4 py-2 rounded-lg border mb-4 ${theme === 'dark' ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-300'}`}
-            />
-            <button
-              onClick={saveApiKey}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
-            >
-              Save & Continue
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <header className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b sticky top-0 z-40`}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -158,12 +127,6 @@ function App() {
               className={`px-4 py-2 rounded-lg font-semibold ${currentPage === 'compare' ? 'bg-blue-500 text-white' : `hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}`}
             >
               Compare
-            </button>
-            <button
-              onClick={() => setShowApiModal(true)}
-              className={`px-4 py-2 rounded-lg font-semibold hover:${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}
-            >
-              API Key
             </button>
           </div>
         </div>
