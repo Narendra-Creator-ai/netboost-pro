@@ -7,6 +7,7 @@
 @layer base {
   :root {
     /* ⚠️ AGENT MUST REPLACE: These are placeholder colors. You MUST define a custom palette before writing components. */
+
     /* The template uses distinctive placeholder colors to force customization - do NOT use these in production! */
     
     /* 
@@ -40,6 +41,7 @@
     --card-foreground: 216.9231 19.1176% 26.6667%;
     --popover: 0 0% 100%;
     --popover-foreground: 216.9231 19.1176% 26.6667%;
+
     /* ⚠️ PLACEHOLDER: Replace with your custom primary color (NOT green, NOT blue) */
     --primary: 280 70% 50%;
     --primary-foreground: 0 0% 100%;
@@ -47,6 +49,7 @@
     --secondary-foreground: 215 13.7931% 34.1176%;
     --muted: 220 14.2857% 95.8824%;
     --muted-foreground: 220 8.9362% 46.0784%;
+
     /* ⚠️ PLACEHOLDER: Replace with your custom accent color */
     --accent: 280 60% 60%;
     --accent-foreground: 216.9231 19.1176% 26.6667%;
@@ -54,6 +57,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 220 13.0435% 90.9804%;
     --input: 220 13.0435% 90.9804%;
+
     /* ⚠️ PLACEHOLDER: Replace with your custom ring color (usually matches primary) */
     --ring: 280 70% 50%;
 
@@ -66,6 +70,7 @@
 
     /* Sidebar - ⚠️ PLACEHOLDER: Replace with your custom sidebar colors */
     --sidebar: 204 93.75% 93.7255%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 216.9231 19.1176% 26.6667%;
     --sidebar-primary: 280 70% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -74,20 +79,23 @@
     --sidebar-border: 220 13.0435% 90.9804%;
     --sidebar-ring: 280 70% 50%;
 
+    /* Radix UI - Accordion */
+    --radix-accordion-content-height: auto;
+
     /* Fonts */
-    --font-sans: DM Sans, sans-serif;
-    --font-serif: Lora, serif;
-    --font-mono: IBM Plex Mono, monospace;
+    --font-sans: dm sans, sans-serif;
+    --font-serif: lora, serif;
+    --font-mono: ibm plex mono, monospace;
 
     /* Shadows */
-    --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 1px 2px -2px hsl(0 0% 0% / 0.10);
-    --shadow: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 1px 2px -2px hsl(0 0% 0% / 0.10);
-    --shadow-md: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 2px 4px -2px hsl(0 0% 0% / 0.10);
-    --shadow-lg: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 4px 6px -2px hsl(0 0% 0% / 0.10);
-    --shadow-xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.10), 0px 8px 10px -2px hsl(0 0% 0% / 0.10);
-    --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
+    --shadow-2xs: 0px 4px 8px -1px hsl(0deg 0% 0% / 5%);
+    --shadow-xs: 0px 4px 8px -1px hsl(0deg 0% 0% / 5%);
+    --shadow-sm: 0px 4px 8px -1px hsl(0deg 0% 0% / 10%), 0px 1px 2px -2px hsl(0deg 0% 0% / 10%);
+    --shadow: 0px 4px 8px -1px hsl(0deg 0% 0% / 10%), 0px 1px 2px -2px hsl(0deg 0% 0% / 10%);
+    --shadow-md: 0px 4px 8px -1px hsl(0deg 0% 0% / 10%), 0px 2px 4px -2px hsl(0deg 0% 0% / 10%);
+    --shadow-lg: 0px 4px 8px -1px hsl(0deg 0% 0% / 10%), 0px 4px 6px -2px hsl(0deg 0% 0% / 10%);
+    --shadow-xl: 0px 4px 8px -1px hsl(0deg 0% 0% / 10%), 0px 8px 10px -2px hsl(0deg 0% 0% / 10%);
+    --shadow-2xl: 0px 4px 8px -1px hsl(0deg 0% 0% / 25%);
 
     /* Misc */
     --tracking-normal: 0em;
@@ -103,6 +111,7 @@
     --card-foreground: 216 12.1951% 83.9216%;
     --popover: 217.2414 32.5843% 17.451%;
     --popover-foreground: 216 12.1951% 83.9216%;
+
     /* ⚠️ PLACEHOLDER: Replace with your custom dark mode primary color */
     --primary: 280 65% 55%;
     --primary-foreground: 222.2222 47.3684% 11.1765%;
@@ -142,7 +151,8 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+
+    font-family: var(--font-sans), Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     letter-spacing: var(--tracking-normal);
   }
 }

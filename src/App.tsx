@@ -41,69 +41,39 @@ function App() {
 
     setScanning(true)
     try {
-      // Normalize URL
       let normalizedUrl = urlInput.trim()
       if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
         normalizedUrl = 'https://' + normalizedUrl
       }
 
-      // Get URL ID for VirusTotal
-      const urlBuffer = new TextEncoder().encode(normalizedUrl)
-      const hashBuffer = await crypto.subtle.digest('SHA-256', urlBuffer)
-      const hashArray = Array.from(new Uint8Array(hashBuffer))
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-
-      // Try to get existing report first
-      const response = await fetch(`https://www.virustotal.com/api/v3/urls/${btoa(normalizedUrl).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}`, {
-        method: 'GET',
+      // Call backend API instead of VirusTotal directly
+      const response = await fetch('/api/scan', {
+        method: 'POST',
         headers: {
-          'x-apikey': apiKey,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          url: normalizedUrl,
+          apiKey: apiKey,
+        }),
       })
 
       if (response.ok) {
         const data = await response.json()
-        const stats = data.data.attributes.last_analysis_stats || {
-          malicious: 0,
-          suspicious: 0,
-          undetected: 0,
-          harmless: 0,
-        }
         const result: ScanResult = {
-          url: normalizedUrl,
+          url: data.url,
           scanDate: new Date().toLocaleString(),
-          lastAnalysisStats: stats,
-          safetyScore: calculateSafetyScore(stats),
-          status: 'completed',
+          lastAnalysisStats: data.stats,
+          safetyScore: calculateSafetyScore(data.stats),
+          status: data.status || 'completed',
         }
         setScanResults([result, ...scanResults])
-      } else {
-        // Submit for scanning
-        const formData = new FormData()
-        formData.append('url', normalizedUrl)
-
-        const submitResponse = await fetch('https://www.virustotal.com/api/v3/urls', {
-          method: 'POST',
-          headers: {
-            'x-apikey': apiKey,
-          },
-          body: formData,
-        })
-
-        if (submitResponse.ok) {
-          alert('URL submitted for analysis. It may take a moment to complete.')
-          // Add a placeholder result
-          const result: ScanResult = {
-            url: normalizedUrl,
-            scanDate: new Date().toLocaleString(),
-            lastAnalysisStats: { malicious: 0, suspicious: 0, undetected: 0, harmless: 0 },
-            safetyScore: 50,
-            status: 'pending',
-          }
-          setScanResults([result, ...scanResults])
-        } else {
-          throw new Error('Failed to submit URL for scanning')
+        if (data.message) {
+          alert(data.message)
         }
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to scan URL')
       }
       setUrlInput('')
     } catch (error) {
